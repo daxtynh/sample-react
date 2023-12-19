@@ -1,55 +1,41 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
-/**
- * Uses Tailwind CSS for styling
- * Tailwind file is imported in App.css
- */
+// Dummy data for stocks
+const initialStocks = [
+  { symbol: 'AAPL', price: 150.45, change: -1.23 },
+  { symbol: 'MSFT', price: 295.50, change: 3.25 },
+  // ... More stocks
+];
 
-export default function App() {
+function App() {
+  const [stocks, setStocks] = useState(initialStocks);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStocks(stocks => stocks.map(stock => ({
+        ...stock,
+        price: Math.max(0, (stock.price + (Math.random() - 0.5) * 10).toFixed(2)),
+        change: (Math.random() - 0.5) * 10,
+      })));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="app min-h-screen text-blue-200 flex items-center flex-col p-20">
-      <div className="mb-10 grid grid-cols-4 grid-rows-2 w-1/2 mx-auto">
-        <img className="opacity-25" src={logo} alt="React Logo" width="300" />
-        <img
-          className="col-span-2 row-span-3 animate-spin m-auto"
-          style={{ animationDuration: "30s" }}
-          src={logo}
-          alt="React Logo"
-          width="300"
-        />
-        <img className="opacity-25" src={logo} alt="React Logo" width="300" />
-        <img className="opacity-25" src={logo} alt="React Logo" width="300" />
-        <img className="opacity-25" src={logo} alt="React Logo" width="300" />
-      </div>
-
-      <h1 className="text-2xl lg:text-5xl mb-10 text-right">
-        Welcome to Your New React App{" "}
-        <span className="block text-lg text-blue-400">on DigitalOcean</span>
-      </h1>
-
-      <div className="grid grid-cols-2 grid-rows-2 gap-4">
-        <Button
-          text="DigitalOcean Docs"
-          url="https://www.digitalocean.com/docs/app-platform"
-        />
-        <Button
-          text="DigitalOcean Dashboard"
-          url="https://cloud.digitalocean.com/apps"
-        />
-      </div>
+    <div className="stock-board">
+      {stocks.map((stock, index) => (
+        <div key={index} className="stock-row">
+          <div className="stock-cell stock-symbol">{stock.symbol}</div>
+          <div className="stock-cell stock-price">{stock.price}</div>
+          <div className={`stock-cell stock-change ${stock.change >= 0 ? 'positive' : 'negative'}`}>
+            {stock.change.toFixed(2)}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function Button({ className, text, url = "#" }) {
-  return (
-    <a
-      href={url}
-      className={`${className} py-3 px-6 bg-purple-400 hover:bg-purple-300 text-purple-800 hover:text-purple-900 block rounded text-center shadow flex items-center justify-center leading-snug text-xs transition ease-in duration-150`}
-    >
-      {text}
-    </a>
-  );
-}
+export default App;
